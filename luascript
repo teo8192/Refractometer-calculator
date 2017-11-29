@@ -55,6 +55,6 @@ gc:drawString("Original plato: "..op, 5, 5)
 gc:drawString("Final plato: "..fp..":", 5, 5+20)
 end
 calculate()
-gc:drawString("Corrected plato: "..fg, 5, 5+40)
+gc:drawString("Corrected final gravity: "..fg, 5, 5+40)
 gc:drawString("ABV: "..abv, 5, 5+60)
 end
