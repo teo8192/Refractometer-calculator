@@ -1,14 +1,18 @@
 local screen = platform.window
 local line = 0
 
+local mode = "plato"
+
 local op = "0" --original plato
 local fp = "0" --final plato
 local og = 0 --original gravity from plato value
 local fg = 0 --corrected final gravity from brix values
 local ob = 0 --original brix from plato
 local fb = 0 --final brix from plato
-local abv = 0 --bva from specific gravity values
+local abv = 0 --abv from specific gravity values
 
+local iob = "0" --input original brix
+local ifb = "0" --input final brix
 
 function round(num, numDecimalPlaces)
 local mult = 10^(numDecimalPlaces or 0)
@@ -16,26 +20,42 @@ return math.floor(num * mult + 0.5) / mult
 end
 
 function calculate()
+if mode == "plato" then
 if op ~= "" then 
 ob = 1.00107*tonumber(op)-0.011234
 og = 1+op/(258.6-op/(258.2)*227.1)
 else ob = 0 og = 0 end
 if fp ~= "" then fb = 1.00107*tonumber(fp)-0.011234
 else fb = 0 end
+elseif mode == "brix" then
+ob = tonumber(iob)
+fb = tonumber(ifb)
+og = (ob / (258.6-((ob / 258.2)*227.1))) + 1
+end
 fg = 1.0111958-0.00813003*ob+0.0144032*fb+0.000523555*ob^2-0.00166862*fb^2-0.0000125754*ob^3+0.0000812663*fb^3
 abv = 133.62*(og - fg) 
 if abv >= 6 then abv = (1.04678/0.79)*((og-fg)/fg)*100 end
 end
 
 function on.charIn(char)
+if mode == "plato" then
 if line == 0 then op = op..char
 else fp = fp..char end
+elseif mode == "brix" then
+if line == 0 then iob = iob..char
+else ifb = ifb..char end
+end
 screen:invalidate()
 end
 
 function on.backspaceKey()
+if mode == "plato" then
 if line == 0 then op = op:usub(0,-2)
 else fp = fp:usub(0,-2) end
+elseif mode == "brix" then
+if line == 0 then iob = iob:usub(0,-2)
+else ifb = ifb:usub(0,-2) end
+end
 screen:invalidate()
 end
 
@@ -51,7 +71,7 @@ else line = 1 end
 screen:invalidate()
 end
 
-function on.paint(gc)
+function drawPlato(gc)
 if line == 0 then
 gc:drawString("Original plato: "..op..":", 5, 5)
 gc:drawString("Final plato: "..fp, 5, 5+20)
@@ -59,8 +79,44 @@ else
 gc:drawString("Original plato: "..op, 5, 5)
 gc:drawString("Final plato: "..fp..":", 5, 5+20)
 end 
+end
+
+function drawBrix(gc)
+if line == 0 then
+gc:drawString("Original brix: "..iob..":", 5, 5)
+gc:drawString("Final brix: "..ifb, 5, 5+20)
+else 
+gc:drawString("Original brix: "..iob, 5, 5)
+gc:drawString("Final brix: "..ifb..":", 5, 5+20)
+end 
+end
+
+function plato()
+mode = "plato"
+screen:invalidate()
+end
+
+function brix()
+mode = "brix"
+screen:invalidate()
+end
+
+menu = {{"Mode", {"Plato", plato}, {"Brix", brix}}}
+
+toolpalette.register(menu)
+
+function on.paint(gc)
+if mode == "plato" then drawPlato(gc)
+elseif mode == "brix" then drawBrix(gc) end
+if mode == "plato" then
 if op ~= "0" and fp ~= "0" and op ~= "" and fp ~= "" then
 calculate()
 gc:drawString("Corrected final gravity: "..round(fg, 3), 5, 5+40)
 gc:drawString("ABV: "..round(abv, 2).."%", 5, 5+60) end
+elseif mode == "brix" then
+if iob ~= "0" and iob ~= "" and ifb ~= "0" and ifb ~= "" then
+calculate()
+gc:drawString("Corrected final gravity: "..round(fg, 3), 5, 5+40)
+gc:drawString("ABV: "..round(abv, 2).."%", 5, 5+60) end
+end
 end
