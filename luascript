@@ -1,8 +1,8 @@
 local screen = platform.window
 local line = 0
 
-local op = "12" --original plato
-local fp = "7" --final plato
+local op = "0" --original plato
+local fp = "0" --final plato
 local og = 0 --original gravity from plato value
 local fg = 0 --corrected final gravity from brix values
 local ob = 0 --original brix from plato
@@ -24,7 +24,7 @@ if fp ~= "" then fb = 1.00107*tonumber(fp)-0.011234
 else fb = 0 end
 fg = 1.0111958-0.00813003*ob+0.0144032*fb+0.000523555*ob^2-0.00166862*fb^2-0.0000125754*ob^3+0.0000812663*fb^3
 abv = 133.62*(og - fg) 
-if abv >= 6 then abv = (1.05/0.79)*((og-fg)/fg)*100 end
+if abv >= 6 then abv = (1.04678/0.79)*((og-fg)/fg)*100 end
 end
 
 function on.charIn(char)
@@ -58,8 +58,9 @@ gc:drawString("Final plato: "..fp, 5, 5+20)
 else 
 gc:drawString("Original plato: "..op, 5, 5)
 gc:drawString("Final plato: "..fp..":", 5, 5+20)
-end
+end 
+if op ~= "0" and fp ~= "0" and op ~= "" and fp ~= "" then
 calculate()
 gc:drawString("Corrected final gravity: "..round(fg, 3), 5, 5+40)
-gc:drawString("ABV: "..round(abv, 2), 5, 5+60)
+gc:drawString("ABV: "..round(abv, 2), 5, 5+60) end
 end
