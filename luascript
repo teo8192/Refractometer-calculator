@@ -62,5 +62,5 @@ end
 if op ~= "0" and fp ~= "0" and op ~= "" and fp ~= "" then
 calculate()
 gc:drawString("Corrected final gravity: "..round(fg, 3), 5, 5+40)
-gc:drawString("ABV: "..round(abv, 2), 5, 5+60) end
+gc:drawString("ABV: "..round(abv, 2).."%", 5, 5+60) end
 end
