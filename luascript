@@ -10,6 +10,11 @@ local fb = 0 --final brix from plato
 local abv = 0 --bva from specific gravity values
 
 
+function round(num, numDecimalPlaces)
+local mult = 10^(numDecimalPlaces or 0)
+return math.floor(num * mult + 0.5) / mult
+end
+
 function calculate()
 if op ~= "" then 
 ob = 1.00107*tonumber(op)-0.011234
@@ -55,6 +60,6 @@ gc:drawString("Original plato: "..op, 5, 5)
 gc:drawString("Final plato: "..fp..":", 5, 5+20)
 end
 calculate()
-gc:drawString("Corrected final gravity: "..fg, 5, 5+40)
-gc:drawString("ABV: "..abv, 5, 5+60)
+gc:drawString("Corrected final gravity: "..round(fg, 3), 5, 5+40)
+gc:drawString("ABV: "..round(abv, 2), 5, 5+60)
 end
